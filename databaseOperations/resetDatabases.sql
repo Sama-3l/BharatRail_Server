@@ -1,0 +1,6 @@
+DROP TABLE TrainCities;
+DROP TABLE Journeys;
+DROP TABLE Classes;
+DROP TABLE Users;
+DROP TABLE Trains;
+DROP TABLE Cities;

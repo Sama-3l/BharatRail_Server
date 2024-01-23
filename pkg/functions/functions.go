@@ -2,7 +2,6 @@ package functions
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 func FindOrInsertCity(db *sql.DB, cityName string, shortFormName string) (int64, error) {
@@ -19,9 +18,7 @@ func FindOrInsertCity(db *sql.DB, cityName string, shortFormName string) (int64,
 	}
 
 	// City doesn't exist, insert a new one
-	fmt.Printf("%v\n", cityID)
 	err = db.QueryRow("INSERT INTO cities(shortformname, cityname) VALUES ($1, $2) RETURNING CityID", shortFormName, cityName).Scan(&cityID)
-	fmt.Printf("%v\n", cityID)
 	if err != nil {
 		return 0, err
 	}

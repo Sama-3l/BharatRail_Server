@@ -90,12 +90,17 @@ func AddTrainToDatabase(train Train) (Train, error) {
 	err := db.QueryRow(sqlStatement, train.Name, train.TrainNumber, train.OperationalDays).Scan(&train.TrainID)
 
 	if err != nil {
-		log.Printf("%v\n", err)
+		log.Println(err)
 	}
 
 	train, err = AddTrainCityToDatabase(train, db)
 	if err != nil {
-		log.Printf("%v\n", err)
+		log.Println(err)
+	}
+
+	train, err = AddClassesToDatabase(train, db)
+	if err != nil {
+		log.Println(err)
 	}
 
 	return train, err
@@ -105,14 +110,27 @@ func AddTrainCityToDatabase(train Train, db *sql.DB) (Train, error) {
 	var err error
 
 	for i, value := range train.TrainCities {
+		train.TrainCities[i].TrainID = train.TrainID
 		train.TrainCities[i].CityIndex = int64(i)
 		train.TrainCities[i].CityID, err = functions.FindOrInsertCity(db, value.CityName, value.CityShortFormName)
 		if err != nil {
-			log.Print(err)
+			log.Println(err)
 		}
-		_, err := db.Exec("INSERT INTO traincities(trainid, cityindex, cityname, shortformname, cityid, arrivaltime, departuretime) VALUES ($1, $2, $3, $4, $5, $6, $7)", train.TrainID, train.TrainCities[i].CityIndex, value.CityName, value.CityShortFormName, train.TrainCities[i].CityID, value.ArrivalTime, value.DepartureTime)
+		err = db.QueryRow("INSERT INTO traincities(trainid, cityindex, cityname, shortformname, cityid, arrivaltime, departuretime) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING traincityid", train.TrainID, train.TrainCities[i].CityIndex, value.CityName, value.CityShortFormName, train.TrainCities[i].CityID, value.ArrivalTime, value.DepartureTime).Scan(&train.TrainCities[i].TrainCityID)
 		if err != nil {
-			log.Print(err)
+			log.Println(err)
+		}
+	}
+	return train, err
+}
+
+func AddClassesToDatabase(train Train, db *sql.DB) (Train, error) {
+	var err error
+	for i, value := range train.Classes {
+		train.Classes[i].TrainID = train.TrainID
+		err = db.QueryRow("INSERT INTO classes(trainid, classname, dimension, numbogies) VALUES ($1, $2, $3, $4) RETURNING classid", train.TrainID, value.ClassName, value.Dimension, value.NumBogies).Scan(&train.Classes[i].ClassID)
+		if err != nil {
+			log.Println(err)
 		}
 	}
 	return train, err

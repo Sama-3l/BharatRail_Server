@@ -9,7 +9,7 @@ CREATE TABLE
     Trains (
         TrainID BIGSERIAL PRIMARY KEY,
         Name VARCHAR(255) NOT NULL,
-        TrainNumber VARCHAR(20) NOT NULL,
+        TrainNumber VARCHAR(20) NOT NULL UNIQUE,
         OperationalDays VARCHAR(50) NOT NULL
     );
 
@@ -34,7 +34,7 @@ CREATE TABLE
     TrainCities (
         TrainCityID BIGSERIAL PRIMARY KEY,
         TrainID INT NOT NULL,
-        CityIndex INT NOT NULL UNIQUE,
+        CityIndex INT NOT NULL,
         CityID INT NOT NULL UNIQUE,
         CityName VARCHAR(255) NOT NULL UNIQUE,
         ShortformName VARCHAR(10) NOT NULL UNIQUE,

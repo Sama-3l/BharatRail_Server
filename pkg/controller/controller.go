@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func AddCity(w http.ResponseWriter, req *http.Request) {
@@ -53,4 +56,26 @@ func AddTrain(w http.ResponseWriter, req *http.Request) {
 }
 
 func AddUser(w http.ResponseWriter, req *http.Request) {
+}
+
+func GetTrain(w http.ResponseWriter, req *http.Request) {
+	var train models.Train
+	vars := mux.Vars(req)
+
+	id, err := strconv.ParseInt(vars["trainId"], 10, 64)
+
+	if err != nil {
+		log.Printf("Unable to parse Int %v\n", err)
+	}
+
+	train, err = models.GetTrainById(id, train)
+
+	if err != nil {
+		log.Printf("Error: %v \n", err)
+		w.WriteHeader(http.StatusConflict)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+
+	json.NewEncoder(w).Encode(train)
 }

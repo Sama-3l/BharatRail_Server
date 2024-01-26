@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 // Train model
@@ -131,5 +133,69 @@ func AddClassesToDatabase(train Train, db *sql.DB) (Train, error) {
 			log.Println(err)
 		}
 	}
+	return train, err
+}
+
+func GetTrainById(id int64, train Train) (Train, error) {
+	db := config.CreateConnection()
+	defer db.Close()
+
+	sqlStatement := `SELECT trainid, name, trainnumber, operationaldays FROM trains WHERE trainid = $1`
+	err := db.QueryRow(sqlStatement, id).Scan(&train.TrainID, &train.Name, &train.TrainNumber, &train.OperationalDays)
+	if err != nil {
+		return train, err
+	}
+
+	sqlStatement = `SELECT * FROM TrainCities WHERE TrainID = $1`
+	rows, err := db.Query(sqlStatement, id)
+	if err != nil {
+		return train, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var trainCity TrainCity
+		if err := rows.Scan(
+			&trainCity.TrainCityID,
+			&trainCity.TrainID,
+			&trainCity.CityIndex,
+			&trainCity.CityID,
+			&trainCity.CityName,
+			&trainCity.CityShortFormName,
+			&trainCity.ArrivalTime,
+			&trainCity.DepartureTime,
+		); err != nil {
+			log.Fatal(err)
+		}
+
+		train.TrainCities = append(train.TrainCities, trainCity)
+	}
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	sqlStatement = `SELECT * FROM Classes WHERE TrainID = $1`
+	rows, err = db.Query(sqlStatement, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var class Class
+		if err := rows.Scan(
+			&class.ClassID,
+			&class.TrainID,
+			&class.ClassName,
+			&class.Dimension,
+			&class.NumBogies,
+		); err != nil {
+			log.Fatal(err)
+		}
+
+		train.Classes = append(train.Classes, class)
+	}
+
 	return train, err
 }

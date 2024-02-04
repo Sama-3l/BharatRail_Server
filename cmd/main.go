@@ -15,7 +15,6 @@ func createPort() string {
 	}
 
 	addr := ":" + port
-
 	return addr
 }
 

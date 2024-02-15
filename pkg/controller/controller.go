@@ -56,6 +56,7 @@ func AddTrain(w http.ResponseWriter, req *http.Request) {
 }
 
 func AddUser(w http.ResponseWriter, req *http.Request) {
+	//Auth with Google Cloud
 }
 
 func GetTrain(w http.ResponseWriter, req *http.Request) {

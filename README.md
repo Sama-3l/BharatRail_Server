@@ -80,7 +80,7 @@ These instructions will guide you through setting up the BharatRail server on yo
 
 We welcome contributions from the community! If you'd like to contribute to BharatRail Backend, please follow these guidelines:
 
-1. Fork the repository and create your branch from `main`.
+1. Fork the repository and create your branch from `master`.
 2. Make sure your code follows the established coding standards.
 3. Create descriptive commit messages and PR titles.
 4. Ensure that your changes pass all tests.
